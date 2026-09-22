@@ -4,6 +4,23 @@ server:
 spring:
   application:
     name: ApiGateway
+
+  # --- ADD SPRING OAUTH2 CLIENT CONFIGURATION HERE ---
+  security:
+    oauth2:
+      client:
+        registration:
+          okta:
+            client-id: 9ieMnnikRrLwPSZmwqO7LInlSuD8GxZQ
+            client-secret: 4sjhmJzc-Fmjvb82EHG1dDQdst2tsPovTmN2BuBwDpJC3ii58XboVMe5mV_KcHZE
+            scope: openid, profile, email
+        provider:
+          okta:
+            issuer-uri: https://dev-k2s7z58f0m0jhcxa.us.auth0.com/
+      resourceserver:
+        jwt:
+          issuer-uri: https://dev-k2s7z58f0m0jhcxa.us.auth0.com/
+
   cloud:
     gateway:
       routes:
@@ -11,16 +28,30 @@ spring:
           uri: lb://USERSERVICE
           predicates:
             - Path=/ms/user/**
+          filters:
+            - TokenRelay=
 
         - id: RATINGSERVICE
           uri: lb://RATINGSERVICE
           predicates:
             - Path=/ms/rating/**
+          filters:
+            - TokenRelay=
 
         - id: HOTELSERVICE
           uri: lb://HOTELSERVICE
           predicates:
             - Path=/hotels/**
+          filters:
+            - TokenRelay=
+
+okta:
+  oauth2:
+    issuer: https://dev-k2s7z58f0m0jhcxa.us.auth0.com/
+    audience: http://localhost:8084
+    client-id: 9ieMnnikRrLwPSZmwqO7LInlSuD8GxZQ
+    client-secret: 4sjhmJzc-Fmjvb82EHG1dDQdst2tsPovTmN2BuBwDpJC3ii58XboVMe5mV_KcHZE
+    scopes: openid, profile, email
 
 eureka:
   instance:
